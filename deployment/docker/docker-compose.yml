@@ -1,0 +1,19 @@
+
+name: "consul-journey"
+
+services:
+  consul:
+    image: hashicorp/consul:2.0
+    container_name: consul-dev
+    restart: unless-stopped
+    volumes:
+      - consul_data:/consul/data
+    ports:
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    command: agent -dev -client=0.0.0.0 -ui
+  
+volumes:
+  consul_data:
+    driver: local
