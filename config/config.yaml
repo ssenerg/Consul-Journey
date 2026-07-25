@@ -1,0 +1,16 @@
+logging:
+  console:
+    level: info
+  file:
+    level: debug
+  version: false
+  revision: false
+
+node:
+  consul_address: "127.0.0.1:8500"
+
+server:
+  http:
+    host: 127.0.0.1
+    port: 8080
+    print_routes: false

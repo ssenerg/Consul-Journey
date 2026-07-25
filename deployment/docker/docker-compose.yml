@@ -1,41 +1,16 @@
 name: "consul-journey"
 
-# Consul dev agent for local development.
-#
-# The app instances run on the *host* while Consul runs in this container, so
-# Consul must be able to reach back to the host to scrape each instance's
-# /health endpoint. That means the app has to advertise a host address that is
-# reachable *from inside this container* — not 127.0.0.1 (which, inside the
-# container, is the container itself).
-#
-# The portable address for "the Docker host" is `host.docker.internal`:
-#   - Docker Desktop (macOS/Windows) injects it automatically.
-#   - On Linux the `extra_hosts` entry below maps it to the host gateway.
-#
-# So run the instances with (this is the default in run-cluster.sh):
-#   CJ_ADVERTISE_ADDR=host.docker.internal CJ_BIND_ADDR=0.0.0.0 ./run-cluster.sh
-#
-# NOTE: `network_mode: host` is intentionally NOT used. On Docker Desktop it
-# places the container in the Linux VM's network namespace (not the macOS/
-# Windows host's), so neither the published ports nor host-reachability work as
-# expected — which is exactly what made the /health check fail. Bridge
-# networking with published ports is the reliable, portable setup.
 services:
   consul:
     image: hashicorp/consul:2.0
-    container_name: consul-dev
+    container_name: cj-consul
     restart: unless-stopped
     volumes:
-      - consul_data:/consul/data
+      - cj_consul_data:/consul/data
     ports:
       - "8500:8500"       # HTTP API + UI
-      - "8600:8600/tcp"   # DNS
-      - "8600:8600/udp"
+      - "8600:8600"       # DNS
     command: agent -dev -client=0.0.0.0 -ui
-    extra_hosts:
-      # Makes `host.docker.internal` resolve to the host on Linux too, so the
-      # same CJ_ADVERTISE_ADDR value works across macOS, Windows and Linux.
-      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "consul", "members"]
       interval: 5s
@@ -43,5 +18,5 @@ services:
       retries: 5
 
 volumes:
-  consul_data:
+  cj_consul_data:
     driver: local

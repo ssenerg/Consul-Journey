@@ -1,0 +1,84 @@
+logging:
+  console:
+    enabled: true
+    level: info
+    format: text
+  file:
+    enabled: true
+    name: server
+    level: debug
+    format: json
+    folder: .logs
+    max_size: 10
+    max_age: 7
+    max_backups: 10
+    compress: false
+  version: true
+  revision: true
+
+node:
+  consul_address: ""
+  path_prefix: ""
+  datacenter: ""
+  username: ""
+  password: ""
+  wait_time: 5s
+  token: ""
+  token_file: ""
+  namespace: ""
+  partition: ""
+  locality:
+    enabled: false
+    region: ""
+    zone: ""
+  tls:
+    enabled: false
+    server_name: ""
+    ca_file: ""
+    ca_path: ""
+    cert_file: ""
+    key_file: ""
+    verify: false
+  http_check:
+    enabled: true
+    address_override: ""
+    interval: 5s
+    timeout: 5s
+    success_before_passing: 1
+    failures_before_warning: 1
+    failures_before_critical: 1
+    deregister_after: 10s
+  heartbeat_check:
+    enabled: true
+    interval: 5s
+    ttl: 10s
+    deregister_after: 10s
+  discovery:
+    backoff: 5s
+    coefficient: 1.5
+    max: 20s
+    passing_only: true
+  leader_election:
+    enabled: true
+    ttl: 10s
+    lock_delay: 1ms
+    backoff: 1s
+    coefficient: 1.5
+    max: 9s
+
+server:
+  http:
+    host: 0.0.0.0
+    port: 8080
+    body_limit: 4194304
+    concurrency: 262144
+    read_timeout: 5s
+    write_timeout: 5s
+    idle_timeout: 5s
+    read_buffer_size: 4096
+    write_buffer_size: 4096
+    proxy_header: ""
+    keepalive: true
+    stream_request_body: false
+    shutdown_timeout: 10s
+    print_routes: true
