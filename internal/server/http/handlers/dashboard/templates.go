@@ -291,6 +291,7 @@ const dashboardTemplates = `
               <th>ID</th>
               <th>Node</th>
               <th>HTTP Address</th>
+              <th>gRPC Address</th>
               <th>Status</th>
               <th>Leadership</th>
             </tr>
@@ -306,6 +307,7 @@ const dashboardTemplates = `
               </td>
               <td>{{.Node}}</td>
               <td><span class="addr">{{httpAddr .Peer}}</span></td>
+              <td>{{if .GRPCPort}}<span class="addr">{{grpcAddr .Peer}}</span>{{else}}<span class="dash">&mdash;</span>{{end}}</td>
               <td>
                 <span class="badge {{statusClass .Status}}"><span class="dot"></span>{{statusLabel .Status}}</span>
               </td>
@@ -314,7 +316,7 @@ const dashboardTemplates = `
               </td>
             </tr>
             {{else}}
-            <tr><td colspan="5">
+            <tr><td colspan="6">
               <div class="empty"><div class="big">No peers discovered</div>Waiting for other nodes to register with Consul.</div>
             </td></tr>
             {{end}}
@@ -403,6 +405,14 @@ const dashboardTemplates = `
         <div class="field">
           <div class="k">HTTP Port</div>
           <div class="v mono">{{.Row.HTTPPort}}</div>
+        </div>
+        <div class="field">
+          <div class="k">gRPC Address</div>
+          <div class="v mono">{{if .Row.GRPCPort}}{{grpcAddr .Row.Peer}}{{else}}<span class="dash">&mdash;</span>{{end}}</div>
+        </div>
+        <div class="field">
+          <div class="k">gRPC Port</div>
+          <div class="v mono">{{if .Row.GRPCPort}}{{.Row.GRPCPort}}{{else}}<span class="dash">&mdash;</span>{{end}}</div>
         </div>
         <div class="field">
           <div class="k">Is Leader</div>

@@ -25,6 +25,9 @@ var funcMap = template.FuncMap{
 	"httpAddr": func(p *node.Peer) string {
 		return fmt.Sprintf("%s:%d", p.Address, p.HTTPPort)
 	},
+	"grpcAddr": func(p *node.Peer) string {
+		return fmt.Sprintf("%s:%d", p.Address, p.GRPCPort)
+	},
 }
 
 type baseView struct {
