@@ -82,3 +82,6 @@ server:
     stream_request_body: false
     shutdown_timeout: 10s
     print_routes: true
+  grpc:
+    host: 0.0.0.0
+    port: 8081

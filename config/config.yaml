@@ -14,3 +14,6 @@ server:
     host: 127.0.0.1
     port: 8080
     print_routes: false
+  grpc:
+    host: 127.0.0.1
+    port: 8081

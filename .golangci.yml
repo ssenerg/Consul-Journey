@@ -19,7 +19,7 @@ linters:
     - wastedassign
   exclusions:
     paths:
-      - ^.*\.(pb|y)\.go$
+      - ^.*\.pb\.go$
 formatters:
   enable:
     - gofmt
@@ -33,4 +33,4 @@ formatters:
         - consul-journey
   exclusions:
     paths:
-      - ^.*\.(pb|y)\.go$
+      - ^.*\.pb\.go$

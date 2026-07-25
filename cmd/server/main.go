@@ -7,11 +7,14 @@ import (
 	"syscall"
 
 	"consul-journey/internal/node"
+	"consul-journey/internal/server/grpc"
 	"consul-journey/internal/server/http"
 	"consul-journey/internal/server/http/handlers/dashboard"
 	"consul-journey/internal/server/http/handlers/home"
 	"consul-journey/internal/utils"
 	"consul-journey/internal/utils/logging"
+
+	node_handler "consul-journey/internal/server/grpc/handlers/node"
 
 	"go.uber.org/zap"
 )
@@ -63,6 +66,14 @@ func main() {
 	httpServer.RegisterHandler("/", home.New("/dashboard"))
 	httpServer.RegisterHandler("/dashboard", dashboard.New(node))
 
+	// setup grpc server
+	mainLogger.Info("setting up grpc server ...")
+	grpcServer := grpc.New(logger, cfg.Server.GRPC)
+	mainLogger.Info("grpc server setup complete")
+
+	// setup grpc handlers
+	grpcServer.RegisterHandler(node_handler.New())
+
 	mainLogger.Info("setting up completed")
 
 	// ----------------
@@ -74,6 +85,10 @@ func main() {
 	// start http server
 	httpServer.Start()
 	defer httpServer.Stop()
+
+	// start grpc server
+	grpcServer.Start()
+	defer grpcServer.Stop()
 
 	if err := node.Start(); err != nil {
 		mainLogger.Error("failed to start node", zap.Error(err))
