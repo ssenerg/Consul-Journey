@@ -59,8 +59,7 @@ func main() {
 	mainLogger.Info("http server setup complete")
 
 	// setup http handlers
-	dashboardHandler := dashboard.New(node)
-	httpServer.RegisterHandler("/dashboard", dashboardHandler)
+	httpServer.RegisterHandler("/dashboard", dashboard.New(node))
 
 	mainLogger.Info("setting up completed")
 

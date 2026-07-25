@@ -20,9 +20,15 @@ func New(node *node.Node) *DashboardHandler {
 }
 
 func (h *DashboardHandler) Register(router fiber.Router) {
+	router.Get("/", h.homeHandler)
 	h.registerNode(router.Group("/node"))
 }
 
 func (h *DashboardHandler) registerNode(router fiber.Router) {
 	router.Get("/peers", h.nodePeersHandler)
+	router.Get("/peers/:id", h.nodePeersIDHandler)
+}
+
+func (h *DashboardHandler) homeHandler(c fiber.Ctx) error {
+	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(c.Path() + "/node/peers")
 }

@@ -134,3 +134,14 @@ func (n *Node) GetPeers() []*Peer {
 	}
 	return peers
 }
+
+func (n *Node) GetPeer(id string) *Peer {
+	n.pmu.RLock()
+	defer n.pmu.RUnlock()
+	for _, p := range n.peers {
+		if p.ID == id {
+			return p.Clone()
+		}
+	}
+	return nil
+}
