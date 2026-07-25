@@ -149,3 +149,17 @@ func IsContextDone(ctx context.Context) bool {
 		return false
 	}
 }
+
+func ContextWithCancelOnClose[T any](ctx context.Context, stopSig <-chan T) context.Context {
+	newCtx, cancel := context.WithCancel(ctx)
+	go func() {
+		defer cancel()
+		select {
+		case <-stopSig:
+			return
+		case <-newCtx.Done():
+			return
+		}
+	}()
+	return newCtx
+}
