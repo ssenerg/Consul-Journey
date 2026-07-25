@@ -42,5 +42,7 @@ func (s *Server) Start() {
 }
 
 func (s *Server) Stop() {
+	s.logger.Info("shutting down ...")
 	s.server.GracefulStop()
+	s.logger.Info("shutdown successful")
 }

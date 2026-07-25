@@ -82,6 +82,13 @@ func main() {
 
 	mainLogger.Info("starting ...")
 
+	// start node
+	if err := node.Start(); err != nil {
+		mainLogger.Error("failed to start node", zap.Error(err))
+		return
+	}
+	defer node.Stop()
+
 	// start http server
 	httpServer.Start()
 	defer httpServer.Stop()
@@ -89,12 +96,6 @@ func main() {
 	// start grpc server
 	grpcServer.Start()
 	defer grpcServer.Stop()
-
-	if err := node.Start(); err != nil {
-		mainLogger.Error("failed to start node", zap.Error(err))
-		return
-	}
-	defer node.Stop()
 
 	mainLogger.Info("starting completed")
 
