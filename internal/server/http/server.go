@@ -6,6 +6,7 @@ import (
 
 	"consul-journey/internal"
 	"consul-journey/internal/errors"
+	"consul-journey/internal/server/http/handlers"
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v3"
@@ -16,7 +17,7 @@ import (
 type Server struct {
 	logger    *zap.Logger
 	cfg       *Config
-	App       *fiber.App
+	app       *fiber.App
 	startedCh chan struct{}
 }
 
@@ -45,14 +46,18 @@ func (s *Server) createFiberApp() {
 	app.Get("/healthz", func(c fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusOK)
 	})
-	s.App = app
+	s.app = app
+}
+
+func (s *Server) RegisterHandler(path string, handler handlers.Handler) {
+	handler.Register(s.app.Group(path))
 }
 
 // It panics if the server fails to listen and serve
 func (s *Server) Start() {
 	s.logger.Info("starting ...")
 	go func() {
-		if err := s.App.Listen(s.cfg.srvAddr(), s.fiberListenConfig()); err != nil {
+		if err := s.app.Listen(s.cfg.srvAddr(), s.fiberListenConfig()); err != nil {
 			s.logger.Panic("failed to listen and serve", zap.Error(err))
 		}
 	}()
@@ -62,7 +67,7 @@ func (s *Server) Start() {
 
 func (s *Server) Stop() {
 	s.logger.Info("shutting down ...")
-	if err := s.App.ShutdownWithTimeout(s.cfg.ShutdownTimeout); err != nil {
+	if err := s.app.ShutdownWithTimeout(s.cfg.ShutdownTimeout); err != nil {
 		s.logger.Error("failed to shutdown", zap.Error(err))
 		return
 	}

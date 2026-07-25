@@ -8,6 +8,7 @@ import (
 
 	"consul-journey/internal/node"
 	"consul-journey/internal/server/http"
+	"consul-journey/internal/server/http/handlers/dashboard"
 	"consul-journey/internal/utils"
 	"consul-journey/internal/utils/logging"
 
@@ -39,6 +40,15 @@ func main() {
 	mainLogger.Info("setting up ...")
 	defer mainLogger.Info("shutdown complete")
 
+	// setup node
+	mainLogger.Info("setting up node ...")
+	node, err := node.New(logger, cfg.Node, cfg.Server.HTTP.Port)
+	if err != nil {
+		mainLogger.Error("failed to setup node", zap.Error(err))
+		return
+	}
+	mainLogger.Info("node setup complete")
+
 	// setup http server
 	mainLogger.Info("setting up http server ...")
 	httpServer, err := http.New(logger, cfg.Server.HTTP)
@@ -48,14 +58,9 @@ func main() {
 	}
 	mainLogger.Info("http server setup complete")
 
-	// setup node
-	mainLogger.Info("setting up node ...")
-	node, err := node.New(logger, cfg.Node, cfg.Server.HTTP.Port)
-	if err != nil {
-		mainLogger.Error("failed to setup node", zap.Error(err))
-		return
-	}
-	mainLogger.Info("node setup complete")
+	// setup http handlers
+	dashboardHandler := dashboard.New(node)
+	httpServer.RegisterHandler("/dashboard", dashboardHandler)
 
 	mainLogger.Info("setting up completed")
 

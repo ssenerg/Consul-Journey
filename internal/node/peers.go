@@ -1,6 +1,8 @@
 package node
 
 import (
+	"maps"
+
 	"consul-journey/internal"
 	"consul-journey/internal/utils"
 
@@ -16,6 +18,18 @@ type Peer struct {
 	Status  string
 	Tags    []string
 	Meta    map[string]string
+}
+
+func (p *Peer) Clone() *Peer {
+	return &Peer{
+		ID:      p.ID,
+		Node:    p.Node,
+		Address: p.Address,
+		Port:    p.Port,
+		Status:  p.Status,
+		Tags:    p.Tags[:],
+		Meta:    maps.Clone(p.Meta),
+	}
 }
 
 func (n *Node) runDiscovery() {
@@ -109,4 +123,14 @@ func (n *Node) setPeers(peers []*Peer) {
 	n.pmu.Lock()
 	defer n.pmu.Unlock()
 	n.peers = peers
+}
+
+func (n *Node) GetPeers() []*Peer {
+	n.pmu.RLock()
+	defer n.pmu.RUnlock()
+	peers := make([]*Peer, 0, len(n.peers))
+	for _, p := range n.peers {
+		peers = append(peers, p.Clone())
+	}
+	return peers
 }
