@@ -11,24 +11,24 @@ import (
 )
 
 type Peer struct {
-	ID      string
-	Node    string
-	Address string
-	Port    int
-	Status  string
-	Tags    []string
-	Meta    map[string]string
+	ID       string
+	Node     string
+	Address  string
+	HTTPPort int
+	Status   string
+	Tags     []string
+	Meta     map[string]string
 }
 
 func (p *Peer) Clone() *Peer {
 	return &Peer{
-		ID:      p.ID,
-		Node:    p.Node,
-		Address: p.Address,
-		Port:    p.Port,
-		Status:  p.Status,
-		Tags:    p.Tags[:],
-		Meta:    maps.Clone(p.Meta),
+		ID:       p.ID,
+		Node:     p.Node,
+		Address:  p.Address,
+		HTTPPort: p.HTTPPort,
+		Status:   p.Status,
+		Tags:     p.Tags[:],
+		Meta:     maps.Clone(p.Meta),
 	}
 }
 
@@ -94,14 +94,30 @@ func (n *Node) runDiscovery() {
 			if e.Service.ID == n.id {
 				continue
 			}
+			httpPort := 0
+			for _, p := range e.Service.Ports {
+				if p.Name == "http" {
+					httpPort = p.Port
+					break
+				}
+			}
+			if httpPort == 0 {
+				n.logger.Warn(
+					"no http port found for peer",
+					zap.String("id", e.Service.ID),
+					zap.String("node", e.Node.Node),
+					zap.String("address", e.Service.Address),
+				)
+				continue
+			}
 			peer := &Peer{
-				ID:      e.Service.ID,
-				Node:    e.Node.Node,
-				Address: e.Service.Address,
-				Port:    e.Service.Port,
-				Status:  e.Checks.AggregatedStatus(),
-				Tags:    e.Service.Tags,
-				Meta:    e.Service.Meta,
+				ID:       e.Service.ID,
+				Node:     e.Node.Node,
+				Address:  e.Service.Address,
+				HTTPPort: httpPort,
+				Status:   e.Checks.AggregatedStatus(),
+				Tags:     e.Service.Tags,
+				Meta:     maps.Clone(e.Service.Meta),
 			}
 			if peer.Status == capi.HealthPassing {
 				healthy++
