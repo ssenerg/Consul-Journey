@@ -113,10 +113,6 @@ func (n *Node) LeaderElectionEnabled() bool {
 	return n.cfg.LeaderElection.Enabled
 }
 
-func (n *Node) StartedAt() time.Time {
-	return n.startedAt
-}
-
 func (n *Node) Self() *Peer {
 	return n.GetPeer(n.id)
 }
