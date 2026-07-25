@@ -64,7 +64,7 @@ func (n *Node) buildChecks() capi.AgentServiceChecks {
 	httpCheck := n.cfg.HTTPCheck.toCapiAgentServiceCheck(
 		n.httpCheckID(),
 		"GET",
-		fmt.Sprintf("http://%s:%d/healthz", httpAddress, n.httpPort),
+		fmt.Sprintf("http://%s:%d/dashboard/healthz", httpAddress, n.httpPort),
 	)
 	if httpCheck != nil {
 		checks = append(checks, httpCheck)

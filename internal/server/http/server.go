@@ -42,10 +42,6 @@ func (s *Server) createFiberApp() {
 			},
 		)
 	app.Use(recover.New())
-	// TODO: organize later
-	app.Get("/healthz", func(c fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusOK)
-	})
 	s.app = app
 }
 
