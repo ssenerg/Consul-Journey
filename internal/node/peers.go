@@ -15,6 +15,7 @@ type Peer struct {
 	Address  string
 	Node     string
 	HTTPPort int
+	GRPCPort int
 	Status   string
 	Tags     []string
 	Meta     map[string]string
@@ -26,6 +27,7 @@ func (p *Peer) Clone() *Peer {
 		Address:  p.Address,
 		Node:     p.Node,
 		HTTPPort: p.HTTPPort,
+		GRPCPort: p.GRPCPort,
 		Status:   p.Status,
 		Tags:     p.Tags[:],
 		Meta:     maps.Clone(p.Meta),
@@ -91,11 +93,19 @@ func (n *Node) runDiscovery() {
 		healthy := 0
 		peers := make([]*Peer, 0, len(entries))
 		for _, e := range entries {
-			httpPort := 0
+			httpPort, grpcPort := 0, 0
 			for _, p := range e.Service.Ports {
 				if p.Name == "http" {
 					httpPort = p.Port
-					break
+					if grpcPort != 0 {
+						break
+					}
+				}
+				if p.Name == "grpc" {
+					grpcPort = p.Port
+					if httpPort != 0 {
+						break
+					}
 				}
 			}
 			if httpPort == 0 {
@@ -107,11 +117,21 @@ func (n *Node) runDiscovery() {
 				)
 				continue
 			}
+			if grpcPort == 0 {
+				n.logger.Warn(
+					"no grpc port found for peer",
+					zap.String("id", e.Service.ID),
+					zap.String("node", e.Node.Node),
+					zap.String("address", e.Service.Address),
+				)
+				continue
+			}
 			peer := &Peer{
 				ID:       e.Service.ID,
 				Address:  e.Service.Address,
 				Node:     e.Node.Node,
 				HTTPPort: httpPort,
+				GRPCPort: grpcPort,
 				Status:   e.Checks.AggregatedStatus(),
 				Tags:     e.Service.Tags,
 				Meta:     maps.Clone(e.Service.Meta),

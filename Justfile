@@ -36,7 +36,7 @@ generate:
         protoc -I proto \
         --go_out=proto/gen/go/node --go_opt=paths=source_relative \
         --go-grpc_out=proto/gen/go/node --go-grpc_opt=paths=source_relative \
-        $(find proto -name 'node.proto')
+        node.proto
 
 
 # Run the application in dev mode
@@ -44,8 +44,8 @@ generate:
 dev instances="1": _build_server
     #!/usr/bin/env bash
     set -euo pipefail
-    if ! [[ "{{instances}}" =~ ^[0-9]+$ ]] || [ "{{instances}}" -lt 1 ]; then
-        echo "instances must be a positive integer >= 1 (got '{{instances}}')" >&2
+    if ! [[ "{{instances}}" =~ ^[0-9]+$ ]] || [ "{{instances}}" -lt 1 ] || [ "{{instances}}" -gt 1000 ]; then
+        echo "instances must be a positive integer between 1 and 1000 [inclusive] (got '{{instances}}')" >&2
         exit 1
     fi
     pids=()
@@ -58,9 +58,11 @@ dev instances="1": _build_server
     trap shutdown INT TERM
     for i in $(seq 1 {{instances}}); do
         name=$(printf "server-%03d" "$i")
-        port=$((8080 + i - 1))
+        http_port=$((8080 + i - 1))
+        grpc_port=$((9080 + i - 1))
         CJS_NODE_HTTP_CHECK_ADDRESS_OVERRIDE="host.docker.internal" \
-        CJS_SERVER_HTTP_PORT="$port" \
+        CJS_SERVER_HTTP_PORT="$http_port" \
+        CJS_SERVER_GRPC_PORT="$grpc_port" \
         CJS_LOGGING_FILE_NAME="$name" \
         ./.bin/server > >(sed "s/^/[$name] /") 2>&1 &
         pids+=($!)

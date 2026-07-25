@@ -46,7 +46,7 @@ func main() {
 
 	// setup node
 	mainLogger.Info("setting up node ...")
-	node, err := node.New(logger, cfg.Node, cfg.Server.HTTP.Port)
+	node, err := node.New(logger, cfg.Node, cfg.Server.HTTP.Port, cfg.Server.GRPC.Port)
 	if err != nil {
 		mainLogger.Error("failed to setup node", zap.Error(err))
 		return
@@ -82,13 +82,6 @@ func main() {
 
 	mainLogger.Info("starting ...")
 
-	// start node
-	if err := node.Start(); err != nil {
-		mainLogger.Error("failed to start node", zap.Error(err))
-		return
-	}
-	defer node.Stop()
-
 	// start http server
 	httpServer.Start()
 	defer httpServer.Stop()
@@ -96,6 +89,13 @@ func main() {
 	// start grpc server
 	grpcServer.Start()
 	defer grpcServer.Stop()
+
+	// start node
+	if err := node.Start(); err != nil {
+		mainLogger.Error("failed to start node", zap.Error(err))
+		return
+	}
+	defer node.Stop()
 
 	mainLogger.Info("starting completed")
 

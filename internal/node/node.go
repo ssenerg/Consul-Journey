@@ -22,6 +22,7 @@ type Node struct {
 	client    *capi.Client
 	id        string
 	httpPort  int
+	grpcPort  int
 	startedAt time.Time
 
 	leaderLockRelease chan struct{}
@@ -35,7 +36,7 @@ type Node struct {
 	cancel context.CancelFunc
 }
 
-func New(logger *zap.Logger, cfg *Config, httpPort int) (*Node, error) {
+func New(logger *zap.Logger, cfg *Config, httpPort, grpcPort int) (*Node, error) {
 	logger = logger.Named("node")
 	client, err := capi.NewClient(newCapiConfig(cfg))
 	if err != nil {
@@ -50,6 +51,7 @@ func New(logger *zap.Logger, cfg *Config, httpPort int) (*Node, error) {
 		client:    client,
 		id:        internal.Module() + "-" + utils.RandomString(16),
 		httpPort:  httpPort,
+		grpcPort:  grpcPort,
 		startedAt: time.Now().UTC(),
 
 		leaderLockRelease: make(chan struct{}, 1),
@@ -145,6 +147,11 @@ func (n *Node) register() error {
 			{
 				Name:    "http",
 				Port:    n.httpPort,
+				Default: false,
+			},
+			{
+				Name:    "grpc",
+				Port:    n.grpcPort,
 				Default: true,
 			},
 		},
