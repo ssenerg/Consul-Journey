@@ -105,10 +105,32 @@ func (n *Node) Stop() {
 	n.logger.Info("stopped")
 }
 
+func (n *Node) ID() string {
+	return n.id
+}
+
+func (n *Node) LeaderElectionEnabled() bool {
+	return n.cfg.LeaderElection.Enabled
+}
+
+func (n *Node) StartedAt() time.Time {
+	return n.startedAt
+}
+
+func (n *Node) Self() *Peer {
+	return n.GetPeer(n.id)
+}
+
 func (n *Node) PeersCount() int {
 	n.pmu.RLock()
 	defer n.pmu.RUnlock()
-	return len(n.peers)
+	count := 0
+	for _, p := range n.peers {
+		if p.ID != n.id {
+			count++
+		}
+	}
+	return count
 }
 
 func (n *Node) register() error {

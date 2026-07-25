@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"strings"
+
 	"consul-journey/internal/node"
 	"consul-journey/internal/server/http/handlers"
 
@@ -30,5 +32,5 @@ func (h *DashboardHandler) registerNode(router fiber.Router) {
 }
 
 func (h *DashboardHandler) homeHandler(c fiber.Ctx) error {
-	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(c.Path() + "/node/peers")
+	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(strings.TrimSuffix(c.Path(), "/") + "/node/peers")
 }

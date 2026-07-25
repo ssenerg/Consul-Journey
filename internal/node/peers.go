@@ -12,8 +12,8 @@ import (
 
 type Peer struct {
 	ID       string
-	Node     string
 	Address  string
+	Node     string
 	HTTPPort int
 	Status   string
 	Tags     []string
@@ -23,8 +23,8 @@ type Peer struct {
 func (p *Peer) Clone() *Peer {
 	return &Peer{
 		ID:       p.ID,
-		Node:     p.Node,
 		Address:  p.Address,
+		Node:     p.Node,
 		HTTPPort: p.HTTPPort,
 		Status:   p.Status,
 		Tags:     p.Tags[:],
@@ -91,9 +91,6 @@ func (n *Node) runDiscovery() {
 		healthy := 0
 		peers := make([]*Peer, 0, len(entries))
 		for _, e := range entries {
-			if e.Service.ID == n.id {
-				continue
-			}
 			httpPort := 0
 			for _, p := range e.Service.Ports {
 				if p.Name == "http" {
@@ -112,8 +109,8 @@ func (n *Node) runDiscovery() {
 			}
 			peer := &Peer{
 				ID:       e.Service.ID,
-				Node:     e.Node.Node,
 				Address:  e.Service.Address,
+				Node:     e.Node.Node,
 				HTTPPort: httpPort,
 				Status:   e.Checks.AggregatedStatus(),
 				Tags:     e.Service.Tags,
@@ -146,6 +143,9 @@ func (n *Node) GetPeers() []*Peer {
 	defer n.pmu.RUnlock()
 	peers := make([]*Peer, 0, len(n.peers))
 	for _, p := range n.peers {
+		if p.ID == n.id {
+			continue
+		}
 		peers = append(peers, p.Clone())
 	}
 	return peers

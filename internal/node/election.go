@@ -174,3 +174,12 @@ func (n *Node) setLeader(leaderID string) {
 func leaderElectionKey() string {
 	return fmt.Sprintf("services/%s/leader", internal.Module())
 }
+
+func (n *Node) LeaderID() string {
+	if !n.cfg.LeaderElection.Enabled {
+		return ""
+	}
+	n.pmu.RLock()
+	defer n.pmu.RUnlock()
+	return n.leaderID
+}
