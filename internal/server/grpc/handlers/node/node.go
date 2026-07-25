@@ -23,7 +23,7 @@ func New() *Handler {
 }
 
 func (h *Handler) Ping(ctx context.Context, req *node.PingRequest) (*node.PingResponse, error) {
-	return nil, nil
+	return &node.PingResponse{}, nil
 }
 
 func (h *Handler) Register(s grpc.ServiceRegistrar) {
