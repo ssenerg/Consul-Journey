@@ -74,7 +74,7 @@ type errorView struct {
 	Hint    string
 }
 
-func (h *DashboardHandler) base() baseView {
+func (h *Handler) base() baseView {
 	return baseView{
 		AppName:     internal.AppName(),
 		Version:     internal.Version(),
@@ -83,7 +83,7 @@ func (h *DashboardHandler) base() baseView {
 	}
 }
 
-func (h *DashboardHandler) render(c fiber.Ctx, status int, name string, data any) error {
+func (h *Handler) render(c fiber.Ctx, status int, name string, data any) error {
 	var buf bytes.Buffer
 	if err := tmpl.ExecuteTemplate(&buf, name, data); err != nil {
 		return errors.NewInternal(c.Method()+" "+c.OriginalURL(), err)
@@ -92,7 +92,7 @@ func (h *DashboardHandler) render(c fiber.Ctx, status int, name string, data any
 	return c.Status(status).Send(buf.Bytes())
 }
 
-func (h *DashboardHandler) renderError(c fiber.Ctx, e *errors.Error) error {
+func (h *Handler) renderError(c fiber.Ctx, e *errors.Error) error {
 	view := errorView{
 		baseView: h.base(),
 		Status:   e.Status(),

@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func (h *DashboardHandler) nodePeersHandler(c fiber.Ctx) error {
+func (h *Handler) nodePeersHandler(c fiber.Ctx) error {
 	currentID := h.node.ID()
 	self := h.node.Self()
 	peers := h.node.GetPeers()
@@ -55,7 +55,7 @@ func (h *DashboardHandler) nodePeersHandler(c fiber.Ctx) error {
 	return h.render(c, fiber.StatusOK, "peers", view)
 }
 
-func (h *DashboardHandler) nodePeersIDHandler(c fiber.Ctx) error {
+func (h *Handler) nodePeersIDHandler(c fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
 		return h.renderError(c, ErrPeerIDRequired)

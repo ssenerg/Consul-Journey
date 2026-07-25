@@ -9,6 +9,7 @@ import (
 	"consul-journey/internal/node"
 	"consul-journey/internal/server/http"
 	"consul-journey/internal/server/http/handlers/dashboard"
+	"consul-journey/internal/server/http/handlers/home"
 	"consul-journey/internal/utils"
 	"consul-journey/internal/utils/logging"
 
@@ -59,6 +60,7 @@ func main() {
 	mainLogger.Info("http server setup complete")
 
 	// setup http handlers
+	httpServer.RegisterHandler("/", home.New())
 	httpServer.RegisterHandler("/dashboard", dashboard.New(node))
 
 	mainLogger.Info("setting up completed")

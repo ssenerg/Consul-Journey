@@ -9,28 +9,28 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-type DashboardHandler struct {
+type Handler struct {
 	node *node.Node
 }
 
-var _ handlers.Handler = (*DashboardHandler)(nil)
+var _ handlers.Handler = (*Handler)(nil)
 
-func New(node *node.Node) *DashboardHandler {
-	return &DashboardHandler{
+func New(node *node.Node) *Handler {
+	return &Handler{
 		node: node,
 	}
 }
 
-func (h *DashboardHandler) Register(router fiber.Router) {
+func (h *Handler) Register(router fiber.Router) {
 	router.Get("/", h.homeHandler)
 	h.registerNode(router.Group("/node"))
 }
 
-func (h *DashboardHandler) registerNode(router fiber.Router) {
+func (h *Handler) registerNode(router fiber.Router) {
 	router.Get("/peers", h.nodePeersHandler)
 	router.Get("/peers/:id", h.nodePeersIDHandler)
 }
 
-func (h *DashboardHandler) homeHandler(c fiber.Ctx) error {
+func (h *Handler) homeHandler(c fiber.Ctx) error {
 	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(strings.TrimSuffix(c.Path(), "/") + "/node/peers")
 }
