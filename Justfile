@@ -18,7 +18,6 @@ alias d  := dev
 alias p  := playground
 alias c  := clean
 alias pc := pre-commit
-alias g  := generate
 
 [private]
 default:
@@ -28,16 +27,6 @@ default:
     @echo "Revision: {{ revision }}"
     @echo "-----------------"
     @just --list --unsorted
-
-# Generate the protobuf code
-[group('proto')]
-generate:
-    @mkdir -p proto/gen/go/node && \
-        protoc -I proto \
-        --go_out=proto/gen/go/node --go_opt=paths=source_relative \
-        --go-grpc_out=proto/gen/go/node --go-grpc_opt=paths=source_relative \
-        node.proto
-
 
 # Run the application in dev mode
 [group('go')]

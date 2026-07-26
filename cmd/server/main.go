@@ -14,8 +14,6 @@ import (
 	"consul-journey/internal/utils"
 	"consul-journey/internal/utils/logging"
 
-	node_handler "consul-journey/internal/server/grpc/handlers/node"
-
 	"go.uber.org/zap"
 )
 
@@ -72,7 +70,7 @@ func main() {
 	mainLogger.Info("grpc server setup complete")
 
 	// setup grpc handlers
-	grpcServer.RegisterHandler(node_handler.New())
+	// No handlers yet
 
 	mainLogger.Info("setting up completed")
 
