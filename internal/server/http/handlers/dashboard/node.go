@@ -55,28 +55,30 @@ func (h *Handler) nodePeersHandler(c fiber.Ctx) error {
 	return h.render(c, fiber.StatusOK, "peers", view)
 }
 
-func (h *Handler) nodePeersIDHandler(c fiber.Ctx) error {
-	id := c.Params("id")
-	if id == "" {
-		return h.renderError(c, ErrPeerIDRequired)
-	}
+func (h *Handler) nodePeersIDHandler(peersPath string) fiber.Handler {
+	return func(c fiber.Ctx) error {
+		id := c.Params("id")
+		if id == "" {
+			return h.renderError(c, ErrPeerIDRequired, peersPath)
+		}
 
-	peer := h.node.GetPeer(id)
-	if peer == nil {
-		return h.renderError(c, ErrPeerNotFound)
-	}
+		peer := h.node.GetPeer(id)
+		if peer == nil {
+			return h.renderError(c, ErrPeerNotFound, peersPath)
+		}
 
-	leaderID := h.node.LeaderID()
-	row := newRow(peer, h.node.ID(), leaderID)
+		leaderID := h.node.LeaderID()
+		row := newRow(peer, h.node.ID(), leaderID)
 
-	view := peerView{
-		baseView:   h.base(),
-		Row:        row,
-		Meta:       sortedMeta(peer.Meta),
-		ElectionOn: h.node.LeaderElectionEnabled(),
-		ListPath:   strings.TrimSuffix(c.Path(), "/"+id),
+		view := peerView{
+			baseView:   h.base(),
+			Row:        row,
+			Meta:       sortedMeta(peer.Meta),
+			ElectionOn: h.node.LeaderElectionEnabled(),
+			ListPath:   strings.TrimSuffix(c.Path(), "/"+id),
+		}
+		return h.render(c, fiber.StatusOK, "peer", view)
 	}
-	return h.render(c, fiber.StatusOK, "peer", view)
 }
 
 func newRow(p *node.Peer, currentID, leaderID string) peerRow {

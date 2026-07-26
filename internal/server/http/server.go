@@ -46,7 +46,7 @@ func (s *Server) createFiberApp() {
 }
 
 func (s *Server) RegisterHandler(path string, handler handlers.Handler) {
-	handler.Register(s.app.Group(path))
+	handler.Register(s.app.Group(path).(*fiber.Group))
 }
 
 // It panics if the server fails to listen and serve

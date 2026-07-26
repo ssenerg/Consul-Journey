@@ -70,11 +70,12 @@ type peerView struct {
 
 type errorView struct {
 	baseView
-	Status  int
-	Code    string
-	Message string
-	Path    string
-	Hint    string
+	Status    int
+	Code      string
+	Message   string
+	Path      string
+	Hint      string
+	PeersPath string
 }
 
 func (h *Handler) base() baseView {
@@ -95,14 +96,15 @@ func (h *Handler) render(c fiber.Ctx, status int, name string, data any) error {
 	return c.Status(status).Send(buf.Bytes())
 }
 
-func (h *Handler) renderError(c fiber.Ctx, e *errors.Error) error {
+func (h *Handler) renderError(c fiber.Ctx, e *errors.Error, peersPath string) error {
 	view := errorView{
-		baseView: h.base(),
-		Status:   e.Status(),
-		Code:     e.Code(),
-		Message:  e.Error(),
-		Path:     c.Method() + " " + c.OriginalURL(),
-		Hint:     errorHint(e.Status()),
+		baseView:  h.base(),
+		Status:    e.Status(),
+		Code:      e.Code(),
+		Message:   e.Error(),
+		Path:      c.Method() + " " + c.OriginalURL(),
+		Hint:      errorHint(e.Status()),
+		PeersPath: peersPath,
 	}
 	return h.render(c, e.Status(), "error", view)
 }

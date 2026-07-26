@@ -1,8 +1,6 @@
 package dashboard
 
 import (
-	"strings"
-
 	"consul-journey/internal/node"
 	"consul-journey/internal/server/http/handlers"
 
@@ -21,19 +19,21 @@ func New(node *node.Node) *Handler {
 	}
 }
 
-func (h *Handler) Register(router fiber.Router) {
-	router.Get("/", h.homeHandler)
+func (h *Handler) Register(router *fiber.Group) {
+	router.Get("/", h.homeHandler(router.Prefix+"/node/peers"))
 	router.Get("/healthz", h.healthzHandler)
-	h.registerNode(router.Group("/node"))
+	h.registerNode(router.Group("/node").(*fiber.Group))
 }
 
-func (h *Handler) registerNode(router fiber.Router) {
+func (h *Handler) registerNode(router *fiber.Group) {
 	router.Get("/peers", h.nodePeersHandler)
-	router.Get("/peers/:id", h.nodePeersIDHandler)
+	router.Get("/peers/:id", h.nodePeersIDHandler(router.Prefix+"/peers"))
 }
 
-func (h *Handler) homeHandler(c fiber.Ctx) error {
-	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(strings.TrimSuffix(c.Path(), "/") + "/node/peers")
+func (h *Handler) homeHandler(redirectTo string) fiber.Handler {
+	return func(c fiber.Ctx) error {
+		return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(redirectTo)
+	}
 }
 
 func (h *Handler) healthzHandler(c fiber.Ctx) error {

@@ -1,8 +1,6 @@
 package home
 
 import (
-	"strings"
-
 	"consul-journey/internal/server/http/handlers"
 
 	"github.com/gofiber/fiber/v3"
@@ -20,10 +18,10 @@ func New(redirectTo string) *Handler {
 	}
 }
 
-func (h *Handler) Register(router fiber.Router) {
+func (h *Handler) Register(router *fiber.Group) {
 	router.Get("/", h.homeHandler)
 }
 
 func (h *Handler) homeHandler(c fiber.Ctx) error {
-	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(strings.TrimSuffix(c.Path(), "/") + h.redirectTo)
+	return c.Redirect().Status(fiber.StatusTemporaryRedirect).To(h.redirectTo)
 }

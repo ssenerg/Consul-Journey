@@ -466,7 +466,7 @@ const dashboardTemplates = `
       <div class="error-hint">{{.Hint}}</div>
       <div class="error-path">{{.Path}}</div>
       <div class="error-actions">
-        <a class="btn btn-primary" href="/">&larr; Back to dashboard</a>
+        <a class="btn btn-primary" href="{{.PeersPath}}">&larr; Back to peers</a>
       </div>
     </div>
   </div>
